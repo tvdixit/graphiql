@@ -2,10 +2,10 @@ const express = require("express");
 const app = express();
 const { graphqlHTTP } = require("express-graphql");
 const { GraphQLSchema } = require("graphql");
-const { RootQuery, Mutation } = require("../Controller/userController");
+const { RootQuery, Mutation } = require("../Controller/restaurantController");
 
 app.use(
-  "/register",
+  "/create",
   graphqlHTTP({
     schema: new GraphQLSchema({
       query: RootQuery,
