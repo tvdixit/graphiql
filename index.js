@@ -11,9 +11,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 dbConnect();
 
-const { User, Restaurant } = require("./Routes/index");
+const { User, Restaurant, Inquiry } = require("./Routes/index");
 app.use("/user", User.route);
 app.use("/restaurant", Restaurant.route);
+app.use("/inquiry", Inquiry.route);
 
 app.listen(4500, () => {
   console.log(`Server started at ${process.env.PORT}`);

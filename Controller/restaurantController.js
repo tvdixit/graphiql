@@ -1,31 +1,26 @@
+const { GraphQLObjectType, GraphQLID, GraphQLList } = require("graphql");
+
 const {
-  GraphQLObjectType,
-  GraphQLString,
-  GraphQLID,
-  GraphQLInt,
-  GraphQLList,
-  GraphQLNonNull,
-} = require("graphql");
-const {
-  restaurantType,
+  RestaurantType,
   RestaurantInputType,
 } = require("../GraphQL/restaurantGraphQL");
 const Restaurant = require("../Schema/restaurantSchema");
 
+// Define the RootQuery for querying restaurants
 const RootQuery = new GraphQLObjectType({
   name: "RootQuery",
   fields: {
     restaurant: {
-      type: restaurantType,
+      type: RestaurantType,
       args: { _id: { type: GraphQLID } },
-      resolve: async (_, args) => {
-        return await Restaurant.findById(args._id);
+      resolve(parent, args) {
+        return Restaurant.findById(args._id);
       },
     },
     restaurants: {
-      type: new GraphQLList(restaurantType),
-      resolve: async () => {
-        return await Restaurant.find();
+      type: new GraphQLList(RestaurantType),
+      resolve() {
+        return Restaurant.find({});
       },
     },
   },
@@ -35,29 +30,25 @@ const Mutation = new GraphQLObjectType({
   name: "Mutation",
   fields: {
     createRestaurant: {
-      type: restaurantType,
+      type: RestaurantType,
       args: {
-        input: { type: new GraphQLNonNull(RestaurantInputType) },
+        input: { type: RestaurantInputType },
       },
-      resolve: async (_, { input }) => {
-        const restaurant = new Restaurant(input);
-        const savedRestaurant = await restaurant.save();
-        return savedRestaurant;
+      async resolve(parent, args) {
+        const restaurant = new Restaurant(args.input);
+        return restaurant.save();
       },
     },
     updateRestaurant: {
-      type: restaurantType,
+      type: RestaurantType,
       args: {
-        _id: { type: new GraphQLNonNull(GraphQLID) },
-        input: { type: new GraphQLNonNull(RestaurantInputType) },
+        _id: { type: GraphQLID },
+        input: { type: RestaurantInputType },
       },
-      resolve: async (_, { _id, input }) => {
-        const updatedRestaurant = await Restaurant.findByIdAndUpdate(
-          _id,
-          input,
-          { new: true }
-        );
-        return updatedRestaurant;
+      resolve(parent, args) {
+        return Restaurant.findByIdAndUpdate(args._id, args.input, {
+          new: true,
+        });
       },
     },
   },

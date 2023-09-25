@@ -30,7 +30,7 @@ const restaurantSchema = new mongoose.Schema(
     },
     menu: [
       {
-        category: { type: String, enum: ["veg", "non_veg"] },
+        category: { type: String, enum: ["veg", "non_veg"], default: "veg" },
         dishes: [
           {
             name: { type: String, required: true },
