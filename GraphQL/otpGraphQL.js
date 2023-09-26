@@ -1,4 +1,10 @@
-const { GraphQLObjectType, GraphQLString } = require("graphql");
+const {
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLNonNull,
+  GraphQLSchema,
+} = require("graphql");
+const { generateOTP, sendOTPViaTwilio } = require("../Service/otpSend");
 
 const OTPType = new GraphQLObjectType({
   name: "OTP",
@@ -7,26 +13,38 @@ const OTPType = new GraphQLObjectType({
     otp: { type: GraphQLString },
   }),
 });
-//RootMutation.
+
+const RootQueryType = new GraphQLObjectType({
+  name: "Query",
+  fields: {
+    dummyQuery: {
+      type: GraphQLString,
+      resolve: () => "This is a dummy query.",
+    },
+  },
+});
+
 const OTPMutation = new GraphQLObjectType({
   name: "Mutation",
   fields: {
     sendOTP: {
-      type: GraphQLString, // Return type
+      type: OTPType,
       args: {
-        phone_no: { type: GraphQLString }, // Input argument for phone number
+        phone_no: { type: new GraphQLNonNull(GraphQLString) },
+        // username: { type: GraphQLString },
       },
-      resolve: async (_, { phone_no }) => {
-        // Generate and send OTP using Twilio or your chosen SMS service
-        const otp = generateOTP(); // Implement a function to generate a random OTP
-
-        // Use Twilio or your SMS service to send OTP
-        await sendOTPViaSMS(phone_no, otp); // Implement sendOTPViaSMS function
-
-        return "OTP sent successfully";
+      resolve: async (_, { phone_no, username }) => {
+        const otp = generateOTP();
+        await sendOTPViaTwilio(phone_no, otp);
+        return { phone_no, otp };
       },
     },
   },
 });
 
-module.exports = { OTPType, OTPMutation };
+const schema = new GraphQLSchema({
+  query: RootQueryType,
+  mutation: OTPMutation,
+});
+
+module.exports = schema;

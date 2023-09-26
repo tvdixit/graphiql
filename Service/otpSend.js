@@ -2,18 +2,26 @@ const twilio = require("twilio");
 const { TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER } =
   process.env;
 
+// // Function to generate a random OTP
+// const generateOTP = () => {
+//   return Math.floor(100000 + Math.random() * 900000).toString();
+// };
+
 const generateOTP = () => {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  const otpLength = 6; // Adjust the OTP length as needed
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  return otp.padStart(otpLength, "0"); // Ensure the OTP is exactly 'otpLength' characters long
 };
 
-const sendOTPViaSMS = async (phone_no, otp) => {
+// Function to send OTP via Twilio
+const sendOTPViaTwilio = async (phone_no, otp) => {
   const client = new twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 
   try {
     await client.messages.create({
       body: `Your OTP is: ${otp}`,
       from: TWILIO_PHONE_NUMBER,
-      to: req.body.phone_no,
+      to: phone_no,
     });
 
     console.log(`OTP sent to ${phone_no}`);
@@ -23,4 +31,7 @@ const sendOTPViaSMS = async (phone_no, otp) => {
   }
 };
 
-module.exports = { generateOTP, sendOTPViaSMS };
+module.exports = {
+  generateOTP,
+  sendOTPViaTwilio,
+};

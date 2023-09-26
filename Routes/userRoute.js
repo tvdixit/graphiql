@@ -2,12 +2,8 @@ const express = require("express");
 const app = express();
 const { graphqlHTTP } = require("express-graphql");
 const { GraphQLSchema, GraphQLObjectType } = require("graphql");
-const {
-  RootQuery,
-  Mutation,
-  OTPMutation,
-} = require("../Controller/userController");
-// const { generateOTP } = require("../Service/otpSend");
+const Schema = require("../GraphQL/otpGraphQL");
+const { RootQuery, Mutation } = require("../Controller/userController");
 
 app.use(
   "/register",
@@ -20,20 +16,11 @@ app.use(
   })
 );
 
-const otpSchema = new GraphQLSchema({
-  mutation: new GraphQLObjectType({
-    name: "Mutation",
-    fields: {
-      sendOTP: OTPMutation,
-    },
-  }),
-});
-
 // Create a GraphQL endpoint
 app.use(
   "/send-otp",
   graphqlHTTP({
-    schema: otpSchema,
+    schema: Schema,
     graphiql: true,
   })
 );
